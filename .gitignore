@@ -6,3 +6,6 @@ venv/
 data/
 *.sqlite
 *.sqlite3
+olist-agent/
+app.py
+*.zip
