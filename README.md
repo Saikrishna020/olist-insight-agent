@@ -34,6 +34,17 @@ User Question → Schema Loader → Question Analyzer → Query Generator
 3. Add your GitHub token to `.env`: `GITHUB_TOKEN=your_token`
 4. Run: `python app.py`
 
+## Streamlit Cloud Deployment
+1. Push the repository to GitHub.
+2. In Streamlit Community Cloud, choose `streamlit_app.py` as the entrypoint.
+3. Add `Github_token` or `GITHUB_TOKEN` in the app secrets.
+4. Deploy the app.
+
+Notes:
+- The app will use the bundled Olist sample locally when `data/olist.sqlite/olist.sqlite` exists.
+- For hosted deployment, the app falls back to the smaller `demo_data/olist_demo.sqlite` bundle.
+- Users can also upload their own SQLite database or point to a local SQLite file path.
+
 ## Status
 - [x] Stage 1 — Natural language to SQL agent (LangGraph + Olist dataset + GPT-4o)
 - [ ] Stage 2 — Auto schema generation from live database connection

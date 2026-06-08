@@ -2,383 +2,421 @@
   "data_source_type": "sql",
   "tables": [
     {
-      "name": "customers",
-      "description": "Olist customers data",
+      "name": "product_category_name_translation",
+      "description": "Contains product category names translated into English for easier data analysis and reporting.",
       "columns": [
-        {
-          "name": "customer_id",
-          "type": "str",
-          "description": "customer id"
-        },
-        {
-          "name": "customer_unique_id",
-          "type": "str",
-          "description": "customer unique id"
-        },
-        {
-          "name": "customer_zip_code_prefix",
-          "type": "int",
-          "description": "customer zip code prefix"
-        },
-        {
-          "name": "customer_city",
-          "type": "str",
-          "description": "customer city"
-        },
-        {
-          "name": "customer_state",
-          "type": "str",
-          "description": "customer state"
-        }
-      ]
-    },
-    {
-      "name": "geolocation",
-      "description": "Olist geolocation data",
-      "columns": [
-        {
-          "name": "geolocation_zip_code_prefix",
-          "type": "int",
-          "description": "geolocation zip code prefix"
-        },
-        {
-          "name": "geolocation_lat",
-          "type": "float",
-          "description": "geolocation lat"
-        },
-        {
-          "name": "geolocation_lng",
-          "type": "float",
-          "description": "geolocation lng"
-        },
-        {
-          "name": "geolocation_city",
-          "type": "str",
-          "description": "geolocation city"
-        },
-        {
-          "name": "geolocation_state",
-          "type": "str",
-          "description": "geolocation state"
-        }
-      ]
-    },
-    {
-      "name": "orders",
-      "description": "Olist orders data",
-      "columns": [
-        {
-          "name": "order_id",
-          "type": "str",
-          "description": "order id"
-        },
-        {
-          "name": "customer_id",
-          "type": "str",
-          "description": "customer id"
-        },
-        {
-          "name": "order_status",
-          "type": "str",
-          "description": "order status"
-        },
-        {
-          "name": "order_purchase_timestamp",
-          "type": "str",
-          "description": "order purchase timestamp"
-        },
-        {
-          "name": "order_approved_at",
-          "type": "str",
-          "description": "order approved at"
-        },
-        {
-          "name": "order_delivered_carrier_date",
-          "type": "str",
-          "description": "order delivered carrier date"
-        },
-        {
-          "name": "order_delivered_customer_date",
-          "type": "str",
-          "description": "order delivered customer date"
-        },
-        {
-          "name": "order_estimated_delivery_date",
-          "type": "str",
-          "description": "order estimated delivery date"
-        }
-      ]
-    },
-    {
-      "name": "order_items",
-      "description": "Olist order items data",
-      "columns": [
-        {
-          "name": "order_id",
-          "type": "str",
-          "description": "order id"
-        },
-        {
-          "name": "order_item_id",
-          "type": "int",
-          "description": "order item id"
-        },
-        {
-          "name": "product_id",
-          "type": "str",
-          "description": "product id"
-        },
-        {
-          "name": "seller_id",
-          "type": "str",
-          "description": "seller id"
-        },
-        {
-          "name": "shipping_limit_date",
-          "type": "str",
-          "description": "shipping limit date"
-        },
-        {
-          "name": "price",
-          "type": "float",
-          "description": "price"
-        },
-        {
-          "name": "freight_value",
-          "type": "float",
-          "description": "freight value"
-        }
-      ]
-    },
-    {
-      "name": "order_payments",
-      "description": "Olist order payments data",
-      "columns": [
-        {
-          "name": "order_id",
-          "type": "str",
-          "description": "order id"
-        },
-        {
-          "name": "payment_sequential",
-          "type": "int",
-          "description": "payment sequential"
-        },
-        {
-          "name": "payment_type",
-          "type": "str",
-          "description": "payment type"
-        },
-        {
-          "name": "payment_installments",
-          "type": "int",
-          "description": "payment installments"
-        },
-        {
-          "name": "payment_value",
-          "type": "float",
-          "description": "payment value"
-        }
-      ]
-    },
-    {
-      "name": "order_reviews",
-      "description": "Olist order reviews data",
-      "columns": [
-        {
-          "name": "review_id",
-          "type": "str",
-          "description": "review id"
-        },
-        {
-          "name": "order_id",
-          "type": "str",
-          "description": "order id"
-        },
-        {
-          "name": "review_score",
-          "type": "int",
-          "description": "review score"
-        },
-        {
-          "name": "review_comment_title",
-          "type": "float",
-          "description": "review comment title"
-        },
-        {
-          "name": "review_comment_message",
-          "type": "str",
-          "description": "review comment message"
-        },
-        {
-          "name": "review_creation_date",
-          "type": "str",
-          "description": "review creation date"
-        },
-        {
-          "name": "review_answer_timestamp",
-          "type": "str",
-          "description": "review answer timestamp"
-        }
-      ]
-    },
-    {
-      "name": "products",
-      "description": "Olist products data",
-      "columns": [
-        {
-          "name": "product_id",
-          "type": "str",
-          "description": "product id"
-        },
         {
           "name": "product_category_name",
-          "type": "str",
-          "description": "product category name"
+          "type": "TEXT",
+          "description": "product_category_name"
         },
         {
-          "name": "product_name_lenght",
-          "type": "int",
-          "description": "product name lenght"
-        },
-        {
-          "name": "product_description_lenght",
-          "type": "int",
-          "description": "product description lenght"
-        },
-        {
-          "name": "product_photos_qty",
-          "type": "int",
-          "description": "product photos qty"
-        },
-        {
-          "name": "product_weight_g",
-          "type": "int",
-          "description": "product weight g"
-        },
-        {
-          "name": "product_length_cm",
-          "type": "int",
-          "description": "product length cm"
-        },
-        {
-          "name": "product_height_cm",
-          "type": "int",
-          "description": "product height cm"
-        },
-        {
-          "name": "product_width_cm",
-          "type": "int",
-          "description": "product width cm"
+          "name": "product_category_name_english",
+          "type": "TEXT",
+          "description": "product_category_name_english"
         }
       ]
     },
     {
       "name": "sellers",
-      "description": "Olist sellers data",
+      "description": "Stores information about sellers, including their unique IDs, location data such as ZIP code, city, and state.",
       "columns": [
         {
           "name": "seller_id",
-          "type": "str",
-          "description": "seller id"
+          "type": "TEXT",
+          "description": "seller_id"
         },
         {
           "name": "seller_zip_code_prefix",
-          "type": "int",
-          "description": "seller zip code prefix"
+          "type": "INTEGER",
+          "description": "seller_zip_code_prefix"
         },
         {
           "name": "seller_city",
-          "type": "str",
-          "description": "seller city"
+          "type": "TEXT",
+          "description": "seller_city"
         },
         {
           "name": "seller_state",
-          "type": "str",
-          "description": "seller state"
+          "type": "TEXT",
+          "description": "seller_state"
         }
       ]
     },
     {
-      "name": "product_category_name_translation",
-      "description": "Olist product category name translation data",
+      "name": "customers",
+      "description": "Contains customer information including unique identifiers, ZIP code prefixes, city, and state.",
       "columns": [
         {
-          "name": "product_category_name",
-          "type": "str",
-          "description": "product category name"
+          "name": "customer_id",
+          "type": "TEXT",
+          "description": "customer_id"
         },
         {
-          "name": "product_category_name_english",
-          "type": "str",
-          "description": "product category name english"
+          "name": "customer_unique_id",
+          "type": "TEXT",
+          "description": "customer_unique_id"
+        },
+        {
+          "name": "customer_zip_code_prefix",
+          "type": "INTEGER",
+          "description": "customer_zip_code_prefix"
+        },
+        {
+          "name": "customer_city",
+          "type": "TEXT",
+          "description": "customer_city"
+        },
+        {
+          "name": "customer_state",
+          "type": "TEXT",
+          "description": "customer_state"
+        }
+      ]
+    },
+    {
+      "name": "geolocation",
+      "description": "Provides geolocation data based on ZIP code prefix, including latitude, longitude, city, and state information.",
+      "columns": [
+        {
+          "name": "geolocation_zip_code_prefix",
+          "type": "INTEGER",
+          "description": "geolocation_zip_code_prefix"
+        },
+        {
+          "name": "geolocation_lat",
+          "type": "REAL",
+          "description": "geolocation_lat"
+        },
+        {
+          "name": "geolocation_lng",
+          "type": "REAL",
+          "description": "geolocation_lng"
+        },
+        {
+          "name": "geolocation_city",
+          "type": "TEXT",
+          "description": "geolocation_city"
+        },
+        {
+          "name": "geolocation_state",
+          "type": "TEXT",
+          "description": "geolocation_state"
+        }
+      ]
+    },
+    {
+      "name": "order_items",
+      "description": "Stores details of items in orders, including order IDs, item IDs, product IDs, seller IDs, shipping deadlines, item prices, and freight values.",
+      "columns": [
+        {
+          "name": "order_id",
+          "type": "TEXT",
+          "description": "order_id"
+        },
+        {
+          "name": "order_item_id",
+          "type": "INTEGER",
+          "description": "order_item_id"
+        },
+        {
+          "name": "product_id",
+          "type": "TEXT",
+          "description": "product_id"
+        },
+        {
+          "name": "seller_id",
+          "type": "TEXT",
+          "description": "seller_id"
+        },
+        {
+          "name": "shipping_limit_date",
+          "type": "TEXT",
+          "description": "shipping_limit_date"
+        },
+        {
+          "name": "price",
+          "type": "REAL",
+          "description": "price"
+        },
+        {
+          "name": "freight_value",
+          "type": "REAL",
+          "description": "freight_value"
+        }
+      ]
+    },
+    {
+      "name": "order_payments",
+      "description": "Contains payment information for orders, including order IDs, payment type, number of installments, sequence of payments, and payment amounts.",
+      "columns": [
+        {
+          "name": "order_id",
+          "type": "TEXT",
+          "description": "order_id"
+        },
+        {
+          "name": "payment_sequential",
+          "type": "INTEGER",
+          "description": "payment_sequential"
+        },
+        {
+          "name": "payment_type",
+          "type": "TEXT",
+          "description": "payment_type"
+        },
+        {
+          "name": "payment_installments",
+          "type": "INTEGER",
+          "description": "payment_installments"
+        },
+        {
+          "name": "payment_value",
+          "type": "REAL",
+          "description": "payment_value"
+        }
+      ]
+    },
+    {
+      "name": "order_reviews",
+      "description": "Holds customer reviews for orders, including review IDs, order IDs, scores, comment titles and messages, creation dates, and timestamps for when responses were made.",
+      "columns": [
+        {
+          "name": "review_id",
+          "type": "TEXT",
+          "description": "review_id"
+        },
+        {
+          "name": "order_id",
+          "type": "TEXT",
+          "description": "order_id"
+        },
+        {
+          "name": "review_score",
+          "type": "INTEGER",
+          "description": "review_score"
+        },
+        {
+          "name": "review_comment_title",
+          "type": "TEXT",
+          "description": "review_comment_title"
+        },
+        {
+          "name": "review_comment_message",
+          "type": "TEXT",
+          "description": "review_comment_message"
+        },
+        {
+          "name": "review_creation_date",
+          "type": "TEXT",
+          "description": "review_creation_date"
+        },
+        {
+          "name": "review_answer_timestamp",
+          "type": "TEXT",
+          "description": "review_answer_timestamp"
+        }
+      ]
+    },
+    {
+      "name": "orders",
+      "description": "Stores details about orders placed by customers, including order status, timestamps for purchase, approval, shipping, delivery, and estimated delivery.",
+      "columns": [
+        {
+          "name": "order_id",
+          "type": "TEXT",
+          "description": "order_id"
+        },
+        {
+          "name": "customer_id",
+          "type": "TEXT",
+          "description": "customer_id"
+        },
+        {
+          "name": "order_status",
+          "type": "TEXT",
+          "description": "order_status"
+        },
+        {
+          "name": "order_purchase_timestamp",
+          "type": "TEXT",
+          "description": "order_purchase_timestamp"
+        },
+        {
+          "name": "order_approved_at",
+          "type": "TEXT",
+          "description": "order_approved_at"
+        },
+        {
+          "name": "order_delivered_carrier_date",
+          "type": "TEXT",
+          "description": "order_delivered_carrier_date"
+        },
+        {
+          "name": "order_delivered_customer_date",
+          "type": "TEXT",
+          "description": "order_delivered_customer_date"
+        },
+        {
+          "name": "order_estimated_delivery_date",
+          "type": "TEXT",
+          "description": "order_estimated_delivery_date"
+        }
+      ]
+    },
+    {
+      "name": "products",
+      "description": "Provides information about products including product IDs, category names, name lengths, description lengths, number of photos, dimensions, and weight.",
+      "columns": [
+        {
+          "name": "product_id",
+          "type": "TEXT",
+          "description": "product_id"
+        },
+        {
+          "name": "product_category_name",
+          "type": "TEXT",
+          "description": "product_category_name"
+        },
+        {
+          "name": "product_name_lenght",
+          "type": "REAL",
+          "description": "product_name_lenght"
+        },
+        {
+          "name": "product_description_lenght",
+          "type": "REAL",
+          "description": "product_description_lenght"
+        },
+        {
+          "name": "product_photos_qty",
+          "type": "REAL",
+          "description": "product_photos_qty"
+        },
+        {
+          "name": "product_weight_g",
+          "type": "REAL",
+          "description": "product_weight_g"
+        },
+        {
+          "name": "product_length_cm",
+          "type": "REAL",
+          "description": "product_length_cm"
+        },
+        {
+          "name": "product_height_cm",
+          "type": "REAL",
+          "description": "product_height_cm"
+        },
+        {
+          "name": "product_width_cm",
+          "type": "REAL",
+          "description": "product_width_cm"
+        }
+      ]
+    },
+    {
+      "name": "leads_qualified",
+      "description": "Tracks marketing qualified leads (MQLs), including IDs, the date of first contact, the landing page ID, and their origin.",
+      "columns": [
+        {
+          "name": "mql_id",
+          "type": "TEXT",
+          "description": "mql_id"
+        },
+        {
+          "name": "first_contact_date",
+          "type": "TEXT",
+          "description": "first_contact_date"
+        },
+        {
+          "name": "landing_page_id",
+          "type": "TEXT",
+          "description": "landing_page_id"
+        },
+        {
+          "name": "origin",
+          "type": "TEXT",
+          "description": "origin"
+        }
+      ]
+    },
+    {
+      "name": "leads_closed",
+      "description": "Contains detailed information on closed leads, including MQL IDs, seller IDs, sales representative IDs, win dates, business segment, lead type, profiles, company presence, GTIN availability, stock levels, business types, declared product catalog sizes, and monthly revenue.",
+      "columns": [
+        {
+          "name": "mql_id",
+          "type": "TEXT",
+          "description": "mql_id"
+        },
+        {
+          "name": "seller_id",
+          "type": "TEXT",
+          "description": "seller_id"
+        },
+        {
+          "name": "sdr_id",
+          "type": "TEXT",
+          "description": "sdr_id"
+        },
+        {
+          "name": "sr_id",
+          "type": "TEXT",
+          "description": "sr_id"
+        },
+        {
+          "name": "won_date",
+          "type": "TEXT",
+          "description": "won_date"
+        },
+        {
+          "name": "business_segment",
+          "type": "TEXT",
+          "description": "business_segment"
+        },
+        {
+          "name": "lead_type",
+          "type": "TEXT",
+          "description": "lead_type"
+        },
+        {
+          "name": "lead_behaviour_profile",
+          "type": "TEXT",
+          "description": "lead_behaviour_profile"
+        },
+        {
+          "name": "has_company",
+          "type": "INTEGER",
+          "description": "has_company"
+        },
+        {
+          "name": "has_gtin",
+          "type": "INTEGER",
+          "description": "has_gtin"
+        },
+        {
+          "name": "average_stock",
+          "type": "TEXT",
+          "description": "average_stock"
+        },
+        {
+          "name": "business_type",
+          "type": "TEXT",
+          "description": "business_type"
+        },
+        {
+          "name": "declared_product_catalog_size",
+          "type": "REAL",
+          "description": "declared_product_catalog_size"
+        },
+        {
+          "name": "declared_monthly_revenue",
+          "type": "REAL",
+          "description": "declared_monthly_revenue"
         }
       ]
     }
   ],
-  "relationships": [
-    {
-      "from_table": "orders",
-      "from_column": "customer_id",
-      "to_table": "customers",
-      "to_column": "customer_id",
-      "description": "each order belongs to one customer"
-    },
-    {
-      "from_table": "orders",
-      "from_column": "order_id",
-      "to_table": "order_items",
-      "to_column": "order_id",
-      "description": "one order has multiple items"
-    },
-    {
-      "from_table": "orders",
-      "from_column": "order_id",
-      "to_table": "order_payments",
-      "to_column": "order_id",
-      "description": "one order has one or more payments"
-    },
-    {
-      "from_table": "orders",
-      "from_column": "order_id",
-      "to_table": "order_reviews",
-      "to_column": "order_id",
-      "description": "one order can have one review"
-    },
-    {
-      "from_table": "order_items",
-      "from_column": "product_id",
-      "to_table": "products",
-      "to_column": "product_id",
-      "description": "each order item is a product"
-    },
-    {
-      "from_table": "order_items",
-      "from_column": "seller_id",
-      "to_table": "sellers",
-      "to_column": "seller_id",
-      "description": "each order item is sold by a seller"
-    },
-    {
-      "from_table": "products",
-      "from_column": "product_category_name",
-      "to_table": "product_category_name_translation",
-      "to_column": "product_category_name",
-      "description": "translates category name to english"
-    },
-    {
-      "from_table": "customers",
-      "from_column": "customer_zip_code_prefix",
-      "to_table": "geolocation",
-      "to_column": "geolocation_zip_code_prefix",
-      "description": "customer location coordinates"
-    },
-    {
-      "from_table": "sellers",
-      "from_column": "seller_zip_code_prefix",
-      "to_table": "geolocation",
-      "to_column": "geolocation_zip_code_prefix",
-      "description": "seller location coordinates"
-    }
-  ]
+  "relationships": []
 }
