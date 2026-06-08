@@ -1,38 +1,65 @@
 # Olist Insight Agent
 
-A natural language SQL agent built with LangGraph that answers business questions 
-from the Olist Brazilian E-Commerce dataset in plain English.
+An interactive decision-intelligence app for e-commerce analysis.
+Built with LangGraph and Streamlit, it can answer business questions over the
+Olist Brazilian E-Commerce dataset or a user-provided SQLite database.
 
-## What it does
-- Takes a business question in plain English
-- Identifies relevant tables from the data model
-- Generates SQL query automatically
-- Executes against real data
-- Returns a plain English insight
+## Why It Exists
+Most dashboards are passive. This app turns data exploration into a guided workflow:
+it shows the dataset first, helps the user understand what is available, and then
+lets them ask business questions in plain English.
+
+## Core Features
+- Data-first UI with table cards, row counts, and sample question prompts
+- Bundled Olist sample for instant use
+- Upload a SQLite file or point to a local SQLite path
+- Automatic schema discovery and cache-backed schema loading
+- Natural language to SQL query generation
+- Multi-query analysis mode for deeper investigation
+- Dashboard-style results with SQL, rows, and a chat-like history
 
 ## Example
 **Question:** What are the top 5 product categories by number of orders?
 
-**Answer:** The top 5 product categories are bed_bath_table (11,115 orders), 
-health_beauty (9,670 orders), sports_leisure (8,641 orders), 
-furniture_decor (8,334 orders), and computers_accessories (7,827 orders).
+**Answer:** The top 5 product categories are bed_bath_table (11,115 orders), health_beauty (9,670 orders), sports_leisure (8,641 orders), furniture_decor (8,334 orders), and computers_accessories (7,827 orders).
 
 ## Architecture
-User Question → Schema Loader → Question Analyzer → Query Generator 
-→ Query Validator → Query Executor → Insight Synthesizer → Plain English Answer
+Source Selector -> Schema Loader -> Question Analyzer -> Query Generator -> Query Validator -> Query Executor -> Insight Synthesizer -> Dashboard UI
 
 ## Tech Stack
-- LangGraph — agent framework
+- LangGraph - agent orchestration
+- Streamlit - UI
 - Python 3.11
-- SQLite — Olist database
-- GitHub Models (GPT-4o) — LLM
-- Streamlit — UI (coming soon)
+- SQLite - data source
+- GitHub Models (GPT-4o) - LLM
 
-## Setup
+## Run Locally
 1. Clone the repo
-2. Install dependencies: `pip install -r requirements.txt`
-3. Add your GitHub token to `.env`: `GITHUB_TOKEN=your_token`
-4. Run: `python app.py`
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Add your token to `.env`:
+   ```env
+   Github_token=your_token
+   ```
+   or
+   ```env
+   GITHUB_TOKEN=your_token
+   ```
+4. Start the app:
+   ```bash
+   streamlit run streamlit_app.py
+   ```
+
+## Data Sources
+The app supports:
+- Bundled Olist sample data
+- Uploaded SQLite databases
+- Local SQLite file paths
+
+For Streamlit Community Cloud, the app falls back to the smaller demo database
+in `demo_data/olist_demo.sqlite` so the hosted version has a usable default source.
 
 ## Streamlit Cloud Deployment
 1. Push the repository to GitHub.
@@ -40,12 +67,17 @@ User Question → Schema Loader → Question Analyzer → Query Generator
 3. Add `Github_token` or `GITHUB_TOKEN` in the app secrets.
 4. Deploy the app.
 
-Notes:
-- The app will use the bundled Olist sample locally when `data/olist.sqlite/olist.sqlite` exists.
-- For hosted deployment, the app falls back to the smaller `demo_data/olist_demo.sqlite` bundle.
-- Users can also upload their own SQLite database or point to a local SQLite file path.
+## Project Status
+- [x] Streamlit UI with data-source selection
+- [x] Bundled demo database for hosted deployment
+- [x] Automatic schema loading for SQLite sources
+- [x] Natural language to SQL flow
+- [x] Multi-query analysis mode
+- [ ] Direct Postgres/MySQL connection support
+- [ ] CSV upload support
+- [ ] Production auth and multi-user workspace support
 
-## Status
-- [x] Stage 1 — Natural language to SQL agent (LangGraph + Olist dataset + GPT-4o)
-- [ ] Stage 2 — Auto schema generation from live database connection
-- [ ] Stage 3 — Agentic Data Analyst (autonomous multi-query investigation)
+## Notes
+- The full local Olist database is used when `data/olist.sqlite/olist.sqlite` exists.
+- If that database is unavailable, the app falls back to `demo_data/olist_demo.sqlite`.
+- Uploaded SQLite files are copied to a temporary local folder for inspection.
