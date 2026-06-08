@@ -1,15 +1,11 @@
-import hashlib
 import html
 import sqlite3
-import tempfile
-import inspect
 from pathlib import Path
 
 import streamlit as st
 
 from src.app import invoke_agent
-from src.config import DEMO_DB_PATH, DEFAULT_DB_PATH, DEFAULT_SCHEMA_PATH
-from src.graph import build_graph
+from src.config import DEFAULT_DB_PATH
 from src.tools import generate_and_save_schema, load_schema
 
 
@@ -21,41 +17,19 @@ st.set_page_config(
 )
 
 
-def _make_upload_path(uploaded_name: str, file_bytes: bytes) -> Path:
-    digest = hashlib.sha256(file_bytes).hexdigest()[:12]
-    safe_name = Path(uploaded_name).stem.replace(" ", "_")
-    upload_dir = Path(tempfile.gettempdir()) / "olist_insight_agent_uploads"
-    upload_dir.mkdir(parents=True, exist_ok=True)
-    return upload_dir / f"{safe_name}_{digest}.sqlite"
-
-
-def _save_uploaded_db(uploaded_file) -> Path:
-    file_bytes = uploaded_file.getvalue()
-    target = _make_upload_path(uploaded_file.name, file_bytes)
-    if not target.exists():
-        target.write_bytes(file_bytes)
-    return target
-
-
-def _bundled_db_path() -> Path | None:
-    if Path(DEFAULT_DB_PATH).exists():
-        return Path(DEFAULT_DB_PATH)
-    if Path(DEMO_DB_PATH).exists():
-        return Path(DEMO_DB_PATH)
+def resolve_db_path() -> Path | None:
+    if DEFAULT_DB_PATH.exists():
+        return DEFAULT_DB_PATH
     return None
 
 
 @st.cache_data(show_spinner=False)
-def load_catalog(db_path: str, cache_key: str) -> tuple[dict, dict]:
-    schema_file = Path(DEFAULT_SCHEMA_PATH)
-    bundled_db = _bundled_db_path()
-    if bundled_db and Path(db_path) == bundled_db and schema_file.exists():
-        schema = load_schema(str(schema_file))
+def load_catalog(db_path: str) -> tuple[dict, dict]:
+    schema_path = Path("schemas") / f"{Path(db_path).stem}_schema.json"
+    if schema_path.exists():
+        schema = load_schema(str(schema_path))
     else:
-        try:
-            schema = generate_and_save_schema(db_path, cache_key=cache_key)
-        except TypeError:
-            schema = generate_and_save_schema(db_path)
+        schema = generate_and_save_schema(db_path)
 
     counts: dict[str, int] = {}
     conn = sqlite3.connect(db_path)
@@ -75,25 +49,6 @@ def load_catalog(db_path: str, cache_key: str) -> tuple[dict, dict]:
 
 def format_count(value: int) -> str:
     return f"{value:,}"
-
-
-def run_agent_with_source(question: str, mode: str, db_path: str):
-    signature = inspect.signature(invoke_agent)
-    if "db_path" in signature.parameters:
-        return invoke_agent(question, mode=mode, db_path=db_path)
-
-    if db_path and db_path != str(DEFAULT_DB_PATH):
-        graph = build_graph()
-        return graph.invoke(
-            {
-                "question": question,
-                "messages": [],
-                "mode": mode,
-                "db_path": db_path,
-            }
-        )
-
-    return invoke_agent(question, mode=mode)
 
 
 def render_answer_card(answer: str) -> None:
@@ -190,66 +145,6 @@ def render_history(turns: list[dict]) -> None:
                     st.json(result["analysis_summary"])
 
 
-def pick_data_source() -> tuple[str, str, str, str]:
-    """
-    Returns:
-    - db_path
-    - cache_key
-    - source_label
-    - source_detail
-    """
-    with st.sidebar:
-        st.markdown("### Data source")
-        source_mode = st.radio(
-            "Choose how to load data",
-            ["Bundled Olist sample", "Upload SQLite database", "Use local SQLite path"],
-            index=0,
-            label_visibility="collapsed",
-        )
-
-        if source_mode == "Bundled Olist sample":
-            bundled_db = _bundled_db_path()
-            if bundled_db:
-                db_path = str(bundled_db)
-                cache_key = bundled_db.stem
-            else:
-                db_path = ""
-                cache_key = ""
-            label = "Bundled Olist sample"
-            detail = f"Using {bundled_db.name}" if bundled_db else "Bundled sample is unavailable"
-
-        elif source_mode == "Upload SQLite database":
-            uploaded = st.file_uploader(
-                "Upload .sqlite/.db file",
-                type=["sqlite", "db", "sqlite3"],
-                help="Upload a SQLite database file and the app will inspect it automatically.",
-            )
-            if uploaded is not None:
-                uploaded_path = _save_uploaded_db(uploaded)
-                db_path = str(uploaded_path)
-                cache_key = uploaded_path.stem
-                label = "Uploaded SQLite database"
-                detail = uploaded.name
-            else:
-                db_path = ""
-                cache_key = ""
-                label = "Uploaded SQLite database"
-                detail = "Waiting for file upload"
-
-        else:
-            local_path = st.text_input(
-                "SQLite file path",
-                value=str(DEFAULT_DB_PATH),
-                help="Enter the full local path to a SQLite database file.",
-            )
-            db_path = local_path.strip()
-            cache_key = Path(local_path).stem if local_path.strip() else ""
-            label = "Local SQLite path"
-            detail = db_path or "Waiting for path"
-
-    return db_path, cache_key, label, detail
-
-
 st.markdown(
     """
     <style>
@@ -258,15 +153,13 @@ st.markdown(
     :root {
         --bg: #f4efe7;
         --bg-2: #fbfaf7;
-        --panel: rgba(255, 255, 255, 0.76);
         --ink: #101828;
         --muted: #667085;
         --line: rgba(16, 24, 40, 0.10);
-        --accent: #0f766e;
         --shadow: 0 18px 55px rgba(16, 24, 40, 0.10);
     }
 
-    html, body, [class*="css"]  {
+    html, body, [class*="css"] {
         font-family: 'Manrope', sans-serif;
     }
 
@@ -402,21 +295,6 @@ st.markdown(
         font-size: 1.05rem;
         font-weight: 800;
         line-height: 1.25;
-    }
-
-    .section-title {
-        font-family: 'Space Grotesk', sans-serif;
-        color: var(--ink);
-        font-size: 1.08rem;
-        margin: 0 0 0.35rem 0;
-        letter-spacing: -0.02em;
-    }
-
-    .section-copy {
-        color: var(--muted);
-        font-size: 0.95rem;
-        margin: 0 0 0.85rem 0;
-        line-height: 1.55;
     }
 
     .data-card {
@@ -604,14 +482,14 @@ if "latest_result" not in st.session_state:
     st.session_state["latest_result"] = None
 
 
-db_path, cache_key, source_label, source_detail = pick_data_source()
-data_ready = bool(db_path and cache_key)
+db_path = resolve_db_path()
+if not db_path:
+    st.error("No Olist database could be found. Check data/olist.sqlite/olist.sqlite or demo_data/olist_demo.sqlite.")
+    st.stop()
 
-current_source_id = f"{db_path}|{cache_key}" if data_ready else "no-source"
-if st.session_state.get("active_source_id") != current_source_id:
-    st.session_state["active_source_id"] = current_source_id
-    st.session_state["turns"] = []
-    st.session_state["latest_result"] = None
+schema, table_counts = load_catalog(str(db_path))
+source_label = "Bundled Olist sample" if db_path == DEFAULT_DB_PATH else "Demo Olist sample"
+
 
 with st.sidebar:
     st.markdown(
@@ -620,7 +498,7 @@ with st.sidebar:
             <div class="brand-kicker">Commerce intelligence</div>
             <h2 class="brand-title">Olist Insight Agent</h2>
             <div class="brand-subtitle">
-                A dashboard replacement for e-commerce questions, anomaly hunting, and multi-query investigation.
+                A grounded BI agent for the Olist Brazilian e-commerce dataset.
             </div>
         </div>
         """,
@@ -635,18 +513,9 @@ with st.sidebar:
         help="Single answers are fast. Analysis mode runs a deeper investigation.",
     )
 
-if data_ready:
-    schema, table_counts = load_catalog(db_path, cache_key)
-else:
-    schema, table_counts = {"tables": []}, {}
-
-
-if data_ready:
-    st.sidebar.markdown("### Active source")
-    st.sidebar.write(f"**{source_label}**")
-    st.sidebar.caption(source_detail)
-else:
-    st.sidebar.warning("Pick or upload a SQLite database to load its tables.")
+    st.markdown("### Active source")
+    st.write(f"**{source_label}**")
+    st.caption("This version stays focused on the Olist domain.")
 
 
 st.markdown(
@@ -654,13 +523,13 @@ st.markdown(
     <div class="hero">
         <div class="hero-topline">
             <span class="pill">Live SQL agent</span>
-            <span class="pill">Data source first</span>
+            <span class="pill">Olist only</span>
             <span class="pill">Chat + dashboard</span>
         </div>
-        <h1>Show the data first, then ask the agent the question.</h1>
+        <h1>Ask business questions over the Olist dataset and get grounded answers.</h1>
         <p>
-            The app now lets the user start with the built-in Olist sample or bring their own SQLite database.
-            Once a source is selected, the tables, counts, and sample question areas appear before the prompt box.
+            The app loads one trusted commerce dataset first, surfaces the tables and row counts, and then lets you
+            ask a question in plain English. The agent chooses tables, writes SQL, validates it, runs it, and explains the result.
         </p>
     </div>
     """,
@@ -673,7 +542,7 @@ overview_a.markdown(
     f"""
     <div class="stat">
         <div class="stat-label">Tables loaded</div>
-        <div class="stat-value">{len(schema["tables"]) if data_ready else 0}</div>
+        <div class="stat-value">{len(schema["tables"])}</div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -682,7 +551,7 @@ overview_b.markdown(
     f"""
     <div class="stat">
         <div class="stat-label">Source</div>
-        <div class="stat-value">{html.escape(source_label if data_ready else "No source selected")}</div>
+        <div class="stat-value">{html.escape(source_label)}</div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -707,55 +576,52 @@ overview_d.markdown(
 )
 
 
-if data_ready:
-    st.markdown('<div class="soft-divider"></div>', unsafe_allow_html=True)
-    st.markdown("### Detected data")
-    st.caption("These cards show the data the agent sees. They give the user context before they ask a question.")
+st.markdown('<div class="soft-divider"></div>', unsafe_allow_html=True)
+st.markdown("### Detected data")
+st.caption("These cards show the data the agent sees before you ask a question.")
 
-    preview_cols = st.columns(3)
-    tables = schema["tables"][:6]
-    for idx, table in enumerate(tables):
-        with preview_cols[idx % 3]:
-            count = table_counts.get(table["name"], 0)
-            table_list = "".join(
-                f'<span class="table-pill">{html.escape(col["name"])} <strong>{html.escape(col["type"] or "TEXT")}</strong></span>'
-                for col in table.get("columns", [])[:4]
-            )
+preview_cols = st.columns(3)
+tables = schema["tables"][:6]
+for idx, table in enumerate(tables):
+    with preview_cols[idx % 3]:
+        count = table_counts.get(table["name"], 0)
+        table_list = "".join(
+            f'<span class="table-pill">{html.escape(col["name"])} <strong>{html.escape(col["type"] or "TEXT")}</strong></span>'
+            for col in table.get("columns", [])[:4]
+        )
+        st.markdown(
+            f"""
+            <div class="data-card">
+                <div class="data-card-top">
+                    <span class="data-badge">Table</span>
+                    <span class="data-count">{format_count(count)} rows</span>
+                </div>
+                <h3>{html.escape(table["name"])}</h3>
+                <p>{html.escape(table.get("description", ""))}</p>
+                <div class="table-list">{table_list}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+with st.expander("Full table inventory", expanded=False):
+    inv_cols = st.columns(2)
+    for idx, table in enumerate(schema["tables"]):
+        col = inv_cols[idx % 2]
+        with col:
             st.markdown(
                 f"""
-                <div class="data-card">
+                <div class="data-card" style="margin-bottom:0.7rem; min-height:auto;">
                     <div class="data-card-top">
                         <span class="data-badge">Table</span>
-                        <span class="data-count">{format_count(count)} rows</span>
+                        <span class="data-count">{format_count(table_counts.get(table["name"], 0))} rows</span>
                     </div>
                     <h3>{html.escape(table["name"])}</h3>
                     <p>{html.escape(table.get("description", ""))}</p>
-                    <div class="table-list">{table_list}</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
-
-    with st.expander("Full table inventory", expanded=False):
-        inv_cols = st.columns(2)
-        for idx, table in enumerate(schema["tables"]):
-            col = inv_cols[idx % 2]
-            with col:
-                st.markdown(
-                    f"""
-                    <div class="data-card" style="margin-bottom:0.7rem; min-height:auto;">
-                        <div class="data-card-top">
-                            <span class="data-badge">Table</span>
-                            <span class="data-count">{format_count(table_counts.get(table["name"], 0))} rows</span>
-                        </div>
-                        <h3>{html.escape(table["name"])}</h3>
-                        <p>{html.escape(table.get("description", ""))}</p>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-else:
-    st.info("Choose a SQLite source in the sidebar to load the data model and show the table cards.")
 
 
 st.markdown('<div class="soft-divider"></div>', unsafe_allow_html=True)
@@ -793,7 +659,7 @@ st.markdown('<div class="soft-divider"></div>', unsafe_allow_html=True)
 st.markdown("### Ask your own question")
 st.caption("This is the actual question composer. The agent will choose tables and SQL automatically.")
 
-question = st.text_area(
+st.text_area(
     "Business question",
     key="question_input",
     height=120,
@@ -803,29 +669,26 @@ question = st.text_area(
 
 composer_left, composer_right = st.columns([0.24, 0.76])
 with composer_left:
-    ask_clicked = st.button("Ask the agent", type="primary", use_container_width=True, disabled=not data_ready)
+    ask_clicked = st.button("Ask the agent", type="primary", use_container_width=True)
 with composer_right:
     st.markdown(
         """
         <div class="small-note">
-        The app loads the selected data source first. If you upload a SQLite database, the schema and tables update automatically.
+        The app loads the Olist source first, then the schema and table counts update automatically.
         </div>
         """,
         unsafe_allow_html=True,
     )
 
 
-if ask_clicked and not data_ready:
-    st.warning("Please choose or upload a SQLite database first.")
-
-if ask_clicked and data_ready:
+if ask_clicked:
     prompt = st.session_state["question_input"].strip()
     if not prompt:
         st.warning("Please enter a question first.")
     else:
         with st.spinner("Running the agent..."):
             try:
-                result = run_agent_with_source(prompt, st.session_state["mode"], db_path)
+                result = invoke_agent(prompt, mode=st.session_state["mode"])
             except Exception as exc:
                 st.error(f"Agent failed: {exc}")
             else:
@@ -854,7 +717,7 @@ render_history(st.session_state["turns"])
 st.markdown(
     """
     <div class="small-note" style="margin-top: 1.2rem; text-align: center;">
-    Built for Olist analysis. You can start with the sample data or upload your own SQLite database.
+    Built for the Olist Brazilian e-commerce dataset. The first version stays focused on one trusted domain.
     </div>
     """,
     unsafe_allow_html=True,

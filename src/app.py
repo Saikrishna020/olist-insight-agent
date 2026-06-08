@@ -47,10 +47,7 @@ OFFTOPIC_HINTS = (
 )
 
 
-def _is_supported_question(question: str, db_path: str | None) -> bool:
-    if db_path and str(db_path) != str(DEFAULT_DB_PATH):
-        return True
-
+def _is_supported_question(question: str) -> bool:
     lowered = question.lower()
     if any(word in lowered for word in OFFTOPIC_HINTS) and not any(
         word in lowered for word in COMMERCE_HINTS
@@ -59,11 +56,11 @@ def _is_supported_question(question: str, db_path: str | None) -> bool:
     return True
 
 
-def invoke_agent(question: str, mode: str = "single", db_path: str | None = None) -> dict:
+def invoke_agent(question: str, mode: str = "single") -> dict:
     default_path = get_bundled_db_path() or DEFAULT_DB_PATH
-    active_db_path = str(db_path or default_path)
+    active_db_path = str(default_path)
 
-    if not _is_supported_question(question, db_path):
+    if not _is_supported_question(question):
         return {
             "question": question,
             "mode": mode,
@@ -109,8 +106,8 @@ def invoke_agent(question: str, mode: str = "single", db_path: str | None = None
         }
 
 
-def run_agent(question: str, mode: str = "single", db_path: str | None = None):
-    result = invoke_agent(question, mode, db_path=db_path)
+def run_agent(question: str, mode: str = "single"):
+    result = invoke_agent(question, mode)
 
     print("\n--- RESULT --------------------------------------------------")
     print("Question :", result.get("question"))

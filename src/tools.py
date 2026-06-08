@@ -251,8 +251,6 @@ def load_schema_from_db(db_path: str) -> dict:
 def generate_and_save_schema(
     db_path: str,
     output_folder: str = "schemas",
-    cache_key: str | None = None,
-    **kwargs,
 ) -> dict:
     """
     Smart caching function for schema:
@@ -261,11 +259,8 @@ def generate_and_save_schema(
     """
     os.makedirs(output_folder, exist_ok=True)
 
-    if cache_key is None:
-        cache_key = kwargs.get("cache_key")
-
     db_name = Path(db_path).name
-    db_stem = cache_key or Path(db_name).stem
+    db_stem = Path(db_name).stem
     output_path = os.path.join(output_folder, f"{db_stem}_schema.json")
 
     if os.path.exists(output_path):
